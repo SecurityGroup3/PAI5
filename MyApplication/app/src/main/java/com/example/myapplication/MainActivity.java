@@ -13,6 +13,21 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.FileInputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.security.KeyStore;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+
+import com.example.utils.AuxiliarMethods;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,13 +47,17 @@ public class MainActivity extends AppCompatActivity {
     RadioButton radioButton;
 
     // Setup Server information
-    protected static String server = "192.168.1.133";
+    protected static String server = "10.0.2.2";
     protected static int port = 7070;
+    protected static SSLSocket conexion;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        startClient();
+
 
         input1 = (EditText) findViewById(R.id.input1);
         input2 = (EditText) findViewById(R.id.input2);
@@ -71,6 +90,31 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void startClient(){
+        int puerto = 7071;
+        try{
+
+            SSLContext context = SSLContext.getInstance("TLS");
+            TrustManager[] tM = AuxiliarMethods.getTrustFactoryClient().getTrustManagers();
+            KeyManager[] kM = AuxiliarMethods.getKeyFactoryClient().getKeyManagers();
+            context.init(kM, tM, null);
+
+            SSLSocketFactory factory = context.getSocketFactory();
+            conexion = (SSLSocket) factory.createSocket(server, puerto);
+            conexion.startHandshake();
+
+            PrintWriter salida = new PrintWriter(
+                    new OutputStreamWriter(conexion.getOutputStream()),true);
+            System.out.println("enviando ... Hola Mundo!");
+            salida.println("Hola mundo");
+
+            conexion.close();
+        }
+        catch (Exception e){
+            System.out.println("error: " + e.toString());
+        }
     }
 
     // Creación de un cuadro de dialogo para confirmar pedido
