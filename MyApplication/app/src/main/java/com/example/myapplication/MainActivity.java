@@ -17,7 +17,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.FileInputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -26,9 +34,6 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-
-import com.example.utils.AuxiliarMethods;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 int radioId = radioGroup.getCheckedRadioButtonId();
                 radioButton = findViewById(radioId);
 
@@ -90,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 startClient();
 
                 Toast.makeText(getApplicationContext(), radioButton.getText(), Toast.LENGTH_SHORT).show();
-                //showDialog();
+                showDialog();
 
             }
         });
@@ -140,41 +144,43 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Creación de un cuadro de dialogo para confirmar pedido
-    /**
     private void showDialog() throws Resources.NotFoundException {
-        CheckBox sabanas = (CheckBox) findViewById(R.id.checkBox_sabanas);
-
-
-        if (!sabanas.isChecked()) {
-            // Mostramos un mensaje emergente;
-            //int numSab = Integer.parseInt(mEdit.getText().toString());
-            Toast.makeText(getApplicationContext(), ("num") , Toast.LENGTH_SHORT).show();
-        } else {
-            new AlertDialog.Builder(this)
-                    .setTitle("Enviar")
-                    .setMessage("Se va a proceder al envio")
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                                // Catch ok button and send information
-                                public void onClick(DialogInterface dialog, int whichButton) {
-
-                                    // 1. Extraer los datos de la vista
-
-                                    // 2. Firmar los datos
-
-                                    // 3. Enviar los datos
-
-                                    Toast.makeText(MainActivity.this, "Petición enviada correctamente", Toast.LENGTH_SHORT).show();
+        input1 = (EditText) findViewById(R.id.input1);
+        input2 = (EditText) findViewById(R.id.input2);
+        input3 = (EditText) findViewById(R.id.input3);
+        input4 = (EditText) findViewById(R.id.input4);
+        final int numSab = Integer.parseInt(input1.getText().toString().trim());
+        final int numCam = Integer.parseInt(input2.getText().toString().trim());
+        final int numMes = Integer.parseInt(input3.getText().toString().trim());
+        final int numSil = Integer.parseInt(input4.getText().toString().trim());
+        new AlertDialog.Builder(this)
+                .setTitle("Enviar")
+                .setMessage("Se va a proceder al envio")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            // Catch ok button and send information
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                try{
+                                    KeyPairGenerator keyParGenerator = KeyPairGenerator.getInstance("RSA");
+                                    keyParGenerator.initialize(2048);
+                                    KeyPair keyPair = keyParGenerator.generateKeyPair();
+                                    PublicKey publicKey = keyPair.getPublic();
+                                    PrivateKey privateKey = keyPair.getPrivate();
+                                    Signature firma = Signature.getInstance("SHA256withRSA");
+                                    firma.initSign(privateKey);
+                                    String messageSignature = numSab + "-" + numCam + "-" + numMes + "-" + numSil;
+                                    byte[] bytesOfMessageSignature = messageSignature.getBytes();
+                                    firma.update(bytesOfMessageSignature);
+                                    String message = messageSignature + "-" + publicKey + "-" + bytesOfMessageSignature.toString();
+                                    firma.sign();
+                                }catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+                                    e.printStackTrace();
                                 }
+                                Toast.makeText(MainActivity.this, "Petición enviada correctamente", Toast.LENGTH_SHORT).show();
                             }
+                        }
 
-                    )
-                    .setNegativeButton(android.R.string.no, null).show();
+                )
+                .setNegativeButton(android.R.string.no, null).show();
         }
     }
-     **/
-
-
-}
