@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -66,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
 
         radioGroup = findViewById(R.id.radioGroup);
 
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .permitNetwork().build());
+
+
         // Capturamos el boton de Enviar
         View button = findViewById(R.id.button_send);
 
@@ -101,11 +106,11 @@ public class MainActivity extends AppCompatActivity {
             KeyStore keyStore = KeyStore.getInstance("BKS");
             //FileInputStream file = new FileInputStream("D://ssiiCerts/server.cer");
             //System.out.println(file.toString());
-            keyStore.load(getAssets().open("certs/server/cacerts.jks"),
-                    "gg".toCharArray());
+            keyStore.load(getAssets().open("certs/server/certificate.bks"),
+                    "mypassword".toCharArray());
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(keyStore, "gg".toCharArray());
+            kmf.init(keyStore, "mypassword".toCharArray());
 
             KeyStore trustedStore = KeyStore.getInstance("BKS");
             trustedStore.load(getAssets().open("certs/client/keystore2-0.jks"), "changeit"
