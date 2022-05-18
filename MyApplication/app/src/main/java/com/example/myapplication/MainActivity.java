@@ -98,18 +98,17 @@ public class MainActivity extends AppCompatActivity {
         int puerto = 7071;
         String socket = "http://10.0.2.2:7071";
         try{
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            FileInputStream file = new FileInputStream("D://ssiiCerts/server.cer");
-            System.out.println(file.toString());
-            //keyStore.load(new FileInputStream("D:/ssiiCerts/server.cer"),
-            //        "gg".toCharArray());
+            KeyStore keyStore = KeyStore.getInstance("BKS");
+            //FileInputStream file = new FileInputStream("D://ssiiCerts/server.cer");
+            //System.out.println(file.toString());
+            keyStore.load(getAssets().open("certs/server/cacerts.jks"),
+                    "gg".toCharArray());
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(keyStore, "gg".toCharArray());
 
-            KeyStore trustedStore = KeyStore.getInstance("JKS");
-            trustedStore.load(new FileInputStream(
-                    "./certs/client/keystore2.jks"), "changeit"
+            KeyStore trustedStore = KeyStore.getInstance("BKS");
+            trustedStore.load(getAssets().open("certs/client/keystore2-0.jks"), "changeit"
                     .toCharArray());
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
