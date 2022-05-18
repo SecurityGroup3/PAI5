@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     RadioButton radioButton;
 
     // Setup Server information
-    protected static String server = "10.0.2.2";
+    protected static String server = "http://10.0.2.2";
     protected static int port = 7070;
     protected static SSLSocket conexion;
 
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 mesas = input3.getText().toString();
                 sillas = input4.getText().toString();
 
+                startClient();
 
                 Toast.makeText(getApplicationContext(), radioButton.getText(), Toast.LENGTH_SHORT).show();
                 //showDialog();
@@ -93,12 +94,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startClient(){
+        String ip = "http://10.0.2.2";
         int puerto = 7071;
+        String socket = "http://10.0.2.2:7071";
         try{
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            FileInputStream file = new FileInputStream("D://ssiiCerts/server.cer");
+            System.out.println(file.toString());
+            //keyStore.load(new FileInputStream("D:/ssiiCerts/server.cer"),
+            //        "gg".toCharArray());
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(keyStore, "gg".toCharArray());
+
+            KeyStore trustedStore = KeyStore.getInstance("JKS");
+            trustedStore.load(new FileInputStream(
+                    "./certs/client/keystore2.jks"), "changeit"
+                    .toCharArray());
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(trustedStore);
 
             SSLContext context = SSLContext.getInstance("TLS");
-            TrustManager[] tM = AuxiliarMethods.getTrustFactoryClient().getTrustManagers();
-            KeyManager[] kM = AuxiliarMethods.getKeyFactoryClient().getKeyManagers();
+            TrustManager[] tM = tmf.getTrustManagers();
+            KeyManager[] kM = kmf.getKeyManagers();
             context.init(kM, tM, null);
 
             SSLSocketFactory factory = context.getSocketFactory();
