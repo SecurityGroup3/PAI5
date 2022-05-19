@@ -12,18 +12,18 @@
         android:text="Hospital Warehouse APP"
         tools:text="Hospital Warehouse APP" />
 
-    <CheckBox
-        android:id="@+id/checkBox_sabanas"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView"
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="218dp"
+        android:layout_height="51dp"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginStart="21dp"
-        android:layout_marginLeft="21dp"
-        android:layout_marginTop="41dp"
-        android:checked="false"
-        android:text="Sábanas" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="87dp"
+        android:layout_marginTop="48dp"
+        android:text="Realice la petición del número de items  necesarios"
+        android:textSize="16sp"
+        tools:text="Realice la petición del número de items  necesarios" />
 
     <TextView
         android:id="@+id/Sábanas"
@@ -132,43 +132,48 @@
 
 
     <Button
+        android:id="@+id/button_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enviar"
-        android:id="@+id/button_send"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginRight="35dp"
-        android:layout_marginEnd="35dp"
-        android:layout_marginBottom="35dp" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="155dp"
+        android:layout_marginRight="155dp"
+        android:layout_marginBottom="55dp"
+        android:text="Enviar" />
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="116dp"
+        android:layout_width="128dp"
         android:layout_height="68dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="50dp"
-        android:layout_marginBottom="125dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginBottom="145dp"
         android:text="Seleccione usuario para firmar la petición"
+        android:textSize="16sp"
         tools:text="Seleccione usuario para firmar la petición" />
 
     <RadioGroup
         android:id="@+id/radioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="108dp"
+        android:layout_height="115dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="186dp"
-        android:layout_marginLeft="186dp"
-        android:layout_marginBottom="115dp">
+        android:layout_marginStart="233dp"
+        android:layout_marginLeft="233dp"
+        android:layout_marginBottom="114dp">
 
         <RadioButton
             android:id="@+id/radio1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
             android:text="Usuario 1" />
 
         <RadioButton
@@ -181,6 +186,12 @@
             android:id="@+id/radio3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginBottom="0dp"
             android:text="Usuario 3" />
     </RadioGroup>
 

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -90,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
                 mesas = input3.getText().toString();
                 sillas = input4.getText().toString();
 
-                Toast.makeText(getApplicationContext(), radioButton.getText(), Toast.LENGTH_SHORT).show();
                 showDialog();
 
             }
@@ -131,13 +131,15 @@ public class MainActivity extends AppCompatActivity {
 
             PrintWriter salida = new PrintWriter(
                     new OutputStreamWriter(conexion.getOutputStream()),true);
-            System.out.println("enviando ... Hola Mundo!");
+            System.out.println(message);
             salida.println(message);
 
             conexion.close();
         }
         catch (Exception e){
             System.out.println("error: " + e.toString());
+            Toast.makeText(getApplicationContext(), "No se ha podido realizar una conexión con el servidor", Toast.LENGTH_SHORT).show();
+
         }
     }
 
@@ -146,43 +148,53 @@ public class MainActivity extends AppCompatActivity {
         input2 = (EditText) findViewById(R.id.input2);
         input3 = (EditText) findViewById(R.id.input3);
         input4 = (EditText) findViewById(R.id.input4);
-        final int numSab = Integer.parseInt(input1.getText().toString().trim());
-        final int numCam = Integer.parseInt(input2.getText().toString().trim());
-        final int numMes = Integer.parseInt(input3.getText().toString().trim());
-        final int numSil = Integer.parseInt(input4.getText().toString().trim());
-        new AlertDialog.Builder(this)
-                .setTitle("Enviar")
-                .setMessage("Se va a proceder al envio")
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            // Catch ok button and send information
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                try{
-                                    KeyPairGenerator keyParGenerator = KeyPairGenerator.getInstance("RSA");
-                                    keyParGenerator.initialize(2048);
-                                    KeyPair keyPair = keyParGenerator.generateKeyPair();
-                                    PublicKey publicKey = keyPair.getPublic();
-                                    PrivateKey privateKey = keyPair.getPrivate();
-                                    Signature firma = Signature.getInstance("SHA256withRSA");
-                                    firma.initSign(privateKey);
-                                    String messageSignature = numSab + "-" + numCam + "-" + numMes + "-" + numSil;
-                                    byte[] bytesOfMessageSignature = messageSignature.getBytes();
-                                    firma.update(bytesOfMessageSignature);
-                                    String message = messageSignature + "-" + publicKey + "-" + bytesOfMessageSignature.toString();
-                                    firma.sign();
+        if(TextUtils.isEmpty(input1.getText().toString()) ||
+                TextUtils.isEmpty(input2.getText().toString()) ||
+                TextUtils.isEmpty(input3.getText().toString()) ||
+                TextUtils.isEmpty(input4.getText().toString())){
+            Toast.makeText(getApplicationContext(), "Por favor introduce valores en todos los campos", Toast.LENGTH_SHORT).show();
+        } else if (radioGroup.getCheckedRadioButtonId() == -1) {
+            Toast.makeText(getApplicationContext(), "Por favor seleccione un usuario para firmar", Toast.LENGTH_SHORT).show();
+        } else {
+            final int numSab = Integer.parseInt(input1.getText().toString().trim());
+            final int numCam = Integer.parseInt(input2.getText().toString().trim());
+            final int numMes = Integer.parseInt(input3.getText().toString().trim());
+            final int numSil = Integer.parseInt(input4.getText().toString().trim());
+            new AlertDialog.Builder(this)
+                    .setTitle("Enviar")
+                    .setMessage("Se va a proceder al envio")
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                // Catch ok button and send information
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    try{
+                                        KeyPairGenerator keyParGenerator = KeyPairGenerator.getInstance("RSA");
+                                        keyParGenerator.initialize(2048);
+                                        KeyPair keyPair = keyParGenerator.generateKeyPair();
+                                        PublicKey publicKey = keyPair.getPublic();
+                                        PrivateKey privateKey = keyPair.getPrivate();
+                                        Signature firma = Signature.getInstance("SHA256withRSA");
+                                        firma.initSign(privateKey);
+                                        String messageSignature = numSab + "-" + numCam + "-" + numMes + "-" + numSil;
+                                        byte[] bytesOfMessageSignature = messageSignature.getBytes();
+                                        firma.update(bytesOfMessageSignature);
+                                        String message = messageSignature + "-" + publicKey + "-" + bytesOfMessageSignature.toString();
+                                        firma.sign();
 
-                                    startClient(message);
+                                        startClient(message);
 
 
 
-                                }catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-                                    e.printStackTrace();
+                                    }catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+                                        e.printStackTrace();
+                                    }
+                                    Toast.makeText(MainActivity.this, "Petición enviada correctamente", Toast.LENGTH_SHORT).show();
                                 }
-                                Toast.makeText(MainActivity.this, "Petición enviada correctamente", Toast.LENGTH_SHORT).show();
                             }
-                        }
 
-                )
-                .setNegativeButton(android.R.string.no, null).show();
+                    )
+                    .setNegativeButton(android.R.string.no, null).show();
+        }
+
         }
     }
