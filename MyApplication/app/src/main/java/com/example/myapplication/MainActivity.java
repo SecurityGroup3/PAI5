@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        startClient();
 
 
         input1 = (EditText) findViewById(R.id.input1);
@@ -91,8 +90,6 @@ public class MainActivity extends AppCompatActivity {
                 mesas = input3.getText().toString();
                 sillas = input4.getText().toString();
 
-                startClient();
-
                 Toast.makeText(getApplicationContext(), radioButton.getText(), Toast.LENGTH_SHORT).show();
                 showDialog();
 
@@ -102,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void startClient(){
+    private void startClient(String message){
         String ip = "http://10.0.2.2";
         int puerto = 7071;
         String socket = "http://10.0.2.2:7071";
@@ -135,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             PrintWriter salida = new PrintWriter(
                     new OutputStreamWriter(conexion.getOutputStream()),true);
             System.out.println("enviando ... Hola Mundo!");
-            salida.println("Hola mundo");
+            salida.println(message);
 
             conexion.close();
         }
@@ -173,6 +170,11 @@ public class MainActivity extends AppCompatActivity {
                                     firma.update(bytesOfMessageSignature);
                                     String message = messageSignature + "-" + publicKey + "-" + bytesOfMessageSignature.toString();
                                     firma.sign();
+
+                                    startClient(message);
+
+
+
                                 }catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
                                     e.printStackTrace();
                                 }
