@@ -1,11 +1,14 @@
 package com.example.myapplication;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -13,12 +16,19 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -27,6 +37,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -35,6 +48,11 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+
+import java.nio.file.*;
+import java.security.*;
+import java.security.spec.*;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,9 +75,55 @@ public class MainActivity extends AppCompatActivity {
     protected static String server = "10.0.2.2";
     protected static int port = 7070;
     protected static SSLSocket conexion;
-    protected static byte[] firmaUsuario1 = "".getBytes();
-    protected static byte[] firmaUsuario2 = "".getBytes();
-    protected static byte[] firmaUsuario3 = "".getBytes();
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    protected PublicKey getKeys() throws Exception{
+
+        String publicKeyContent = new String(getAssets().open("keypair/user1").toString());
+
+        //Base64.Decoder b64 = Base64.getDecoder();
+        byte[] decoded = Base64.decode(publicKeyContent, Base64.DEFAULT);
+
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(decoded);
+        KeyFactory keyF = KeyFactory.getInstance("RSA");
+        PublicKey publicK = keyF.generatePublic(spec);
+        return publicK;
+    }
+
+    public PrivateKey getPrivateKey() throws Exception {
+
+        String tContents = "";
+
+        try {
+            InputStream stream = getAssets().open("keypair/user1");
+
+            int size = stream.available();
+            byte[] buffer = new byte[size];
+            stream.read(buffer);
+            stream.close();
+            tContents = new String(buffer);
+        } catch (IOException e) {
+            // Handle exceptions here
+        }
+
+
+        //String publicKeyContent = new String(getAssets().open("keypair/user1").toString());
+        System.out.println("publicKeyContentpublicKeyContent");
+        System.out.println(tContents);
+
+        String privKeyPEM = tContents.replace("-----BEGIN OPENSSH PRIVATE KEY-----\n", "");
+        privKeyPEM = privKeyPEM.replace("-----END OPENSSH PRIVATE KEY-----", "");
+
+        byte[] keyBytes = privKeyPEM.getBytes();
+        //byte [] decoded = Base64.decode(privKeyPEM, Base64.DEFAULT);
+
+        PKCS8EncodedKeySpec spec =
+                new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePrivate(spec);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void startClient(String message, byte[] firma){
+    private void startClient(String message){
         String ip = "http://10.0.2.2";
         int puerto = 7071;
         String socket = "http://10.0.2.2:7071";
@@ -132,10 +196,18 @@ public class MainActivity extends AppCompatActivity {
 
             PrintWriter salida = new PrintWriter(
                     new OutputStreamWriter(conexion.getOutputStream()),true);
-            System.out.println(message);
-            salida.println(message);
-            System.out.println(firma);
-            salida.println(firma);
+
+            try {
+                System.out.println(message);
+                salida.println(message);
+                Toast.makeText(MainActivity.this, "Petición enviada correctamente", Toast.LENGTH_SHORT).show();
+            } catch (Exception e){
+                System.out.println(e);
+            }
+            BufferedReader entrada = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
+            String messagereceived = entrada.readLine();
+            Toast.makeText(getApplicationContext(), messagereceived.toString(), Toast.LENGTH_SHORT).show();
+
 
             conexion.close();
         }
@@ -158,6 +230,11 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Por favor introduce valores en todos los campos", Toast.LENGTH_SHORT).show();
         } else if (radioGroup.getCheckedRadioButtonId() == -1) {
             Toast.makeText(getApplicationContext(), "Por favor seleccione un usuario para firmar", Toast.LENGTH_SHORT).show();
+        } else if ( Integer.parseInt(input1.getText().toString().trim()) > 300 ||
+                Integer.parseInt(input2.getText().toString().trim()) > 300 ||
+                Integer.parseInt(input3.getText().toString().trim())  > 300||
+                Integer.parseInt(input4.getText().toString().trim()) > 300){
+            Toast.makeText(getApplicationContext(), "Por favor seleccione valores por debajo de 300", Toast.LENGTH_SHORT).show();
         } else {
             final int numSab = Integer.parseInt(input1.getText().toString().trim());
             final int numCam = Integer.parseInt(input2.getText().toString().trim());
@@ -169,6 +246,8 @@ public class MainActivity extends AppCompatActivity {
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 // Catch ok button and send information
+                                @RequiresApi(api = Build.VERSION_CODES.O)
+                                @SuppressLint("ResourceType")
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     try{
                                         KeyPairGenerator keyParGenerator = KeyPairGenerator.getInstance("RSA");
@@ -176,38 +255,56 @@ public class MainActivity extends AppCompatActivity {
                                         KeyPair keyPair = keyParGenerator.generateKeyPair();
                                         PublicKey publicKey = keyPair.getPublic();
                                         PrivateKey privateKey = keyPair.getPrivate();
+
                                         Signature firma = Signature.getInstance("SHA256withRSA");
                                         firma.initSign(privateKey);
-                                        String messageSignature = numSab + "-" + numCam + "-" + numMes + "-" + numSil;
-                                        byte[] bytesOfMessageSignature = messageSignature.getBytes();
-                                        firma.update(bytesOfMessageSignature);
-                                        if(radioGroup.getCheckedRadioButtonId() == 0) {
-                                            String message = messageSignature + "-" + firmaUsuario1;
-                                            firma.update(message.getBytes());
+                                        String dataNumbers = numSab + "-" + numCam + "-" + numMes + "-" + numSil;
+                                        int index = radioGroup.indexOfChild(findViewById(radioGroup.getCheckedRadioButtonId()));
+                                        if(index == 0) {
+                                            firma.update(dataNumbers.getBytes());
                                             byte[] firma_ = firma.sign();
+                                            String firmmm = Base64.encodeToString(firma_, Base64.NO_WRAP);
+                                            String publickeyy = Base64.encodeToString(publicKey.getEncoded(), Base64.NO_WRAP | Base64.URL_SAFE);
 
-                                            startClient(message, firma_);
 
-                                        }else if(radioGroup.getCheckedRadioButtonId() == 0) {
-                                            String message = messageSignature + "-" + firmaUsuario2;
-                                            firma.update(message.getBytes());
+                                            System.out.println("USER 1");
+                                            System.out.println(firmmm);
+
+                                            String message = dataNumbers + "," + firmmm + "," + publickeyy;
+                                            startClient(message);
+
+                                        }else if(index == 1) {
+                                            firma.update(dataNumbers.getBytes());
                                             byte[] firma_ = firma.sign();
+                                            String firmmm = Base64.encodeToString(firma_,  Base64.NO_WRAP);
+                                            String publickeyy = Base64.encodeToString(publicKey.getEncoded(),  Base64.NO_WRAP | Base64.URL_SAFE);
 
-                                            startClient(message, firma_);
+
+                                            System.out.println("USER 2");
+                                            System.out.println(firmmm);
+
+                                            String message = dataNumbers + "," + firmmm + "," + publickeyy;
+                                            startClient(message);
 
                                         }else{
-                                            String message = messageSignature + "-" + firmaUsuario3;
-                                            firma.update(message.getBytes());
+                                            firma.update(dataNumbers.getBytes());
                                             byte[] firma_ = firma.sign();
+                                            String firmmm = Base64.encodeToString(firma_, Base64.NO_WRAP);
+                                            String publickeyy = java.util.Base64.getEncoder().encodeToString(publicKey.getEncoded());
 
-                                            startClient(message, firma_);
+
+                                            System.out.println("USER 3");
+                                            System.out.println(firmmm);
+
+                                            String message = dataNumbers + "," + firmmm + "," + publickeyy;
+                                            startClient(message);
                                         }
 
 
                                     }catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
                                         e.printStackTrace();
                                     }
-                                    Toast.makeText(MainActivity.this, "Petición enviada correctamente", Toast.LENGTH_SHORT).show();
+
                                 }
                             }
 
