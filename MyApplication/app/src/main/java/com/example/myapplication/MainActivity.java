@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
                                             firma.update(dataNumbers.getBytes());
                                             byte[] firma_ = firma.sign();
                                             String firmmm = Base64.encodeToString(firma_, Base64.NO_WRAP);
-                                            String publickeyy = Base64.encodeToString(publicKey.getEncoded(), Base64.NO_WRAP | Base64.URL_SAFE);
+                                            String publickeyy = java.util.Base64.getEncoder().encodeToString(publicKey.getEncoded());
 
 
                                             System.out.println("USER 1");
