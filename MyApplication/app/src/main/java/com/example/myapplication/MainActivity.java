@@ -57,8 +57,9 @@ public class MainActivity extends AppCompatActivity {
     protected static String server = "10.0.2.2";
     protected static int port = 7070;
     protected static SSLSocket conexion;
-
-
+    protected static byte[] firmaUsuario1 = "".getBytes();
+    protected static byte[] firmaUsuario2 = "".getBytes();
+    protected static byte[] firmaUsuario3 = "".getBytes();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void startClient(String message){
+    private void startClient(String message, byte[] firma){
         String ip = "http://10.0.2.2";
         int puerto = 7071;
         String socket = "http://10.0.2.2:7071";
@@ -133,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
                     new OutputStreamWriter(conexion.getOutputStream()),true);
             System.out.println(message);
             salida.println(message);
+            System.out.println(firma);
+            salida.println(firma);
 
             conexion.close();
         }
@@ -178,11 +181,27 @@ public class MainActivity extends AppCompatActivity {
                                         String messageSignature = numSab + "-" + numCam + "-" + numMes + "-" + numSil;
                                         byte[] bytesOfMessageSignature = messageSignature.getBytes();
                                         firma.update(bytesOfMessageSignature);
-                                        String message = messageSignature + "-" + publicKey + "-" + bytesOfMessageSignature.toString();
-                                        firma.sign();
+                                        if(radioGroup.getCheckedRadioButtonId() == 0) {
+                                            String message = messageSignature + "-" + firmaUsuario1;
+                                            firma.update(message.getBytes());
+                                            byte[] firma_ = firma.sign();
 
-                                        startClient(message);
+                                            startClient(message, firma_);
 
+                                        }else if(radioGroup.getCheckedRadioButtonId() == 0) {
+                                            String message = messageSignature + "-" + firmaUsuario2;
+                                            firma.update(message.getBytes());
+                                            byte[] firma_ = firma.sign();
+
+                                            startClient(message, firma_);
+
+                                        }else{
+                                            String message = messageSignature + "-" + firmaUsuario3;
+                                            firma.update(message.getBytes());
+                                            byte[] firma_ = firma.sign();
+
+                                            startClient(message, firma_);
+                                        }
 
 
                                     }catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
