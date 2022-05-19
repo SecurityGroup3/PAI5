@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
             kmf.init(keyStore, "changeit".toCharArray());
 
             KeyStore trustedStore = KeyStore.getInstance("BKS");
-            trustedStore.load(getAssets().open("certs/client/fer.bks"), "changeit"
+            trustedStore.load(getAssets().open("certs/server/cacertserverbueno.bks"), "changeit"
                     .toCharArray());
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
