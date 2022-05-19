@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     RadioButton radioButton;
 
     // Setup Server information
-    protected static String server = "http://10.0.2.2";
+    protected static String server = "10.0.2.2";
     protected static int port = 7070;
     protected static SSLSocket conexion;
 
@@ -110,14 +110,14 @@ public class MainActivity extends AppCompatActivity {
             KeyStore keyStore = KeyStore.getInstance("BKS");
             //FileInputStream file = new FileInputStream("D://ssiiCerts/server.cer");
             //System.out.println(file.toString());
-            keyStore.load(getAssets().open("certs/server/certificate.bks"),
-                    "mypassword".toCharArray());
+            keyStore.load(getAssets().open("certs/server/server.bks"),
+                    "changeit".toCharArray());
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(keyStore, "mypassword".toCharArray());
+            kmf.init(keyStore, "changeit".toCharArray());
 
             KeyStore trustedStore = KeyStore.getInstance("BKS");
-            trustedStore.load(getAssets().open("certs/client/keystore2-0.jks"), "changeit"
+            trustedStore.load(getAssets().open("certs/client/fer.bks"), "changeit"
                     .toCharArray());
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
