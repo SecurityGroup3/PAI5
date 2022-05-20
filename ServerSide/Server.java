@@ -1,3 +1,4 @@
+import java.time.LocalDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,7 +22,7 @@ public class Server {
         KeyManager[] kM = AuxiliarMethods.getKeyFactoryServer().getKeyManagers();
         context.init(kM, tM, null);
 
-        SSLServerSocketFactory factory = context.getServerSocketFactory();        
+        SSLServerSocketFactory factory = context.getServerSocketFactory();
         serverSocket = (SSLServerSocket) factory.createServerSocket(port);
         serverSocket.setEnabledCipherSuites(cipherSuites);
         serverSocket.setEnabledProtocols(protocols);
@@ -30,22 +31,27 @@ public class Server {
 
     public void startServer() {
         Timer timer = new Timer();
-        int timeinterval =60 * 60 * 4000;
-        timeinterval =4000*60;
+        int timeinterval = 60 * 60 * 4000;
+        timeinterval = 4000 * 60;
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                
-                ServerConfig.startServer(serverSocket);
-                
+                if (LocalDateTime.now().getDayOfMonth() == 1) {
+                    System.out.println("Creación de informe ");
+                    AuxiliarMethods.writeTendenceFile();
+
+                    ServerConfig.startServer(serverSocket);
+                } else {
+                    ServerConfig.startServer(serverSocket);
+                }
+
             }
-        },0, timeinterval);
-        
-        
+        }, 0, timeinterval);
+
     }
 
     public static void main(String[] args) throws Exception {
-        
+
         new Server(7071).startServer();
 
     }
