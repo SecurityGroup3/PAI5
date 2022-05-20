@@ -12,7 +12,7 @@ public class ServerConfig {
 		new Thread() {
 
 			public void run() {
-				Integer receivedCalls = 0;
+				Integer receivedCalls = 1;
 				try {
 					
 					while (true) {

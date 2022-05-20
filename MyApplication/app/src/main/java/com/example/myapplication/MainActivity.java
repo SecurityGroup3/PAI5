@@ -101,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(java.util.Base64.getDecoder().decode(keyString));
+        PKCS8EncodedKeySpec keySpecPKCS8 =
+                new PKCS8EncodedKeySpec(java.util.Base64.getDecoder().decode(keyString));
         PrivateKey privateKey = kf.generatePrivate(keySpecPKCS8);
         return privateKey;
     }
@@ -160,8 +161,6 @@ public class MainActivity extends AppCompatActivity {
         String socket = "http://10.0.2.2:7071";
         try{
             KeyStore keyStore = KeyStore.getInstance("BKS");
-            //FileInputStream file = new FileInputStream("D://ssiiCerts/server.cer");
-            //System.out.println(file.toString());
             keyStore.load(getAssets().open("certs/server/server.bks"),
                     "changeit".toCharArray());
 

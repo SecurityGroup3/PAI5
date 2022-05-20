@@ -32,7 +32,6 @@ public class Server {
     public void startServer() {
         Timer timer = new Timer();
         int timeinterval = 60 * 60 * 4000;
-        timeinterval = 4000 * 60;
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -44,7 +43,6 @@ public class Server {
                 } else {
                     ServerConfig.startServer(serverSocket);
                 }
-
             }
         }, 0, timeinterval);
 

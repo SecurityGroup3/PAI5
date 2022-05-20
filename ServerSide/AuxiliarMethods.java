@@ -31,7 +31,6 @@ public class AuxiliarMethods {
 
     public static RSAPublicKey getPublicKey(Integer user) throws Exception {
         String publicKey = "";
-        System.out.println("USER "+ user);
         switch (user){
             case (0): {
                 publicKey = publicKey1;
@@ -101,8 +100,7 @@ public class AuxiliarMethods {
     }
 
     public static Boolean checkDataReceived(String data) throws Exception {
-        System.out.println("data received");
-        System.out.println(data);
+        System.out.println("Data received");
         String[] dataSplit = data.split(",");
         String[] values = dataSplit[0].split("-");
         Integer sabanas = Integer.valueOf(values[0]);
@@ -145,7 +143,6 @@ public class AuxiliarMethods {
                 Integer acert = 0;
                 Integer i = 0;
                 while ((strCurrentLine = objReader.readLine()) != null) {
-                    System.out.println(strCurrentLine);
                     if (i == 0) {
                         total = Integer.valueOf(strCurrentLine);
                     } else if (i == 1) {
@@ -174,7 +171,6 @@ public class AuxiliarMethods {
                 Integer total = 0;
                 Integer i = 0;
                 while ((strCurrentLine = objReader.readLine()) != null) {
-                    System.out.println(strCurrentLine);
                     if (i == 0) {
                         total = Integer.valueOf(strCurrentLine);
                     }
@@ -226,7 +222,6 @@ public class AuxiliarMethods {
             objReader = new BufferedReader(new FileReader("./tendences.txt"));
             Integer i = 0;
             while ((strCurrentLine = objReader.readLine()) != null) {
-                System.out.println(strCurrentLine);
                 i++;
             }
             objReader = new BufferedReader(new FileReader("./log.txt"));
@@ -234,7 +229,6 @@ public class AuxiliarMethods {
             float acert = 0;
             Integer j = 0;
             while ((strCurrentLine = objReader.readLine()) != null) {
-                System.out.println(strCurrentLine);
                 if (j == 0) {
                     total = Float.valueOf(strCurrentLine);
                 } else if (j == 1) {
