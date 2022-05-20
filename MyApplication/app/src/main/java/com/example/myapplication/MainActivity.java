@@ -76,52 +76,19 @@ public class MainActivity extends AppCompatActivity {
     protected static int port = 7070;
     protected static SSLSocket conexion;
 
+    protected static String publicKeyY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzvziRpETVJ+agiN8iNs/VFpe5sxemrxnogunkfsNczHqUMa7Jw+VELtrD/G1cjT7LwQt2DoJ34UHWg3S7VgVs3xAqE30/im0HzgINRQyg0/proHIlL2rYqi4kANIPPo32BIRu0mbqfF6yWQ2ye0Ol1yfEyCgL90GysRb/BZunlJdGEFDvVY+u14r2WPWjpk1a3CJYpGQ1yDsXzYZZG372+ZwSmBI/qIX4AaDKeoAj+JuMLHTXYDhEQzRsc+qZhzJ7vv9/xSuxiPcL9fjpNFRIUoUQYlSC1XZ9o5mip3+ldzpKX/p8Du0JwFKdOtbmVaZdZR13VNRl2j0PgFBFICxYwIDAQAB";
+    protected static String privateKeyY = "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDO/OJGkRNUn5qCI3yI2z9UWl7mzF6avGeiC6eR+w1zMepQxrsnD5UQu2sP8bVyNPsvBC3YOgnfhQdaDdLtWBWzfECoTfT+KbQfOAg1FDKDT+mugciUvatiqLiQA0g8+jfYEhG7SZup8XrJZDbJ7Q6XXJ8TIKAv3QbKxFv8Fm6eUl0YQUO9Vj67XivZY9aOmTVrcIlikZDXIOxfNhlkbfvb5nBKYEj+ohfgBoMp6gCP4m4wsdNdgOERDNGxz6pmHMnu+/3/FK7GI9wv1+Ok0VEhShRBiVILVdn2jmaKnf6V3Okpf+nwO7QnAUp061uZVpl1lHXdU1GXaPQ+AUEUgLFjAgMBAAECggEAA4wKkXyUPrla4otRkDqKLjcXGRmOeAtbfLV6Rt3tAAIAwZTlG7blAI4LXNoVmGtb3bnk9vCxY57VeesXJ+OkwLO4dxMHfooW17+K/i1K7bxsV2FvQ975oxtAW5Ej+Y3RlL2I0K6+TqdOEwC3IskkQRWgdamGHBK5WwBTbTX7Mt94aSZlj1eWsP7Aw/xcy2MzIfcuObnMXcBbSf3lKcZjqn6C777gdi7cDluF6Pv4aQNuafkEHyzdvcTGAkIjLyy+eCoUDHSgMOk1V95Cm/2GdGhuo1KdhFeodpCKRfPMfMMhx55JUrHRQRIxIp4vB6+M0pNwP0AdHce2J23RIbDBhQKBgQDz2xaMQrjCITnc7qHXosjn4qY+yVP7eFL95Fj67garCRFfWCDz9wH1gTqRTgW0BzB6Ua0dijtJqOjXkQtj4jEgP2nAZPt1Br8MH3/kFw7G7ToUcYrvH5Rd34AeFaItyOMr13UFE+jQE5DIAVQS1xwlsoTHsqizNCqXTlSvxdQQzQKBgQDZS8RJ1MhuQUWPwx1jIMOALqGTYjf6UqwnWsNCt062AmqVDDXwaRCBkd8D1Rz75L17AAV8jQStplFS8DrJvcD827eCmMnulQTKFlQDqjCiWS2rsOcXTR02WlTvO+Y1AHKr+NoDS7mXqG5UYnRwmQApQomn2uaVKev5twk68lEK7wKBgQDhgwe8GGwCY3W+YhTbdRg0kb7KK6d11BVz5HuBOySBgXZGZRq8Yv61ypeeDrhpf4iOZgAhZFdlzEXgLKuK6IAj4WDr4rdEx0Ngc7Ty+3vX7USb6VDhyKONmIZDzB/aFYA4aB043+uama13uPrGHZZTKl9uykMGzsRgfrkEgH+YNQKBgQCJBKKwX5FHHLdtUH4+XJGKSV0vH1bm7KyLYEsRzZ6/XESy2XFFuCplWYMD2qUdHP5yCfBrukxB50cOgla/kXyYtT9BBXEHlUXg3DV73hwuswb+ZV1CryiFdm5qMB4YO8ETOabXPy+3NsjjQvXjbkbQvZkpk/mkAzw+STFzzwpVVwKBgQDoVlpBdqKgNI3LBNjcXPPJYJrAD1DoLOMgSTq5udIWU9ZGYM8OG6LAWtmC4KfvHRvjlcNf4vAe9TtFgcIx+rJmferTePQDbWoJsWw4FeZP71XaKr/yQIEzXIrdVSYzE5kf7+V6C3QlMUqKbf3YC02zmlIKDlGJ4UKCZi1FukKJqA==";
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    protected PublicKey getKeys() throws Exception{
-
-        String publicKeyContent = new String(getAssets().open("keypair/user1").toString());
-
-        //Base64.Decoder b64 = Base64.getDecoder();
-        byte[] decoded = Base64.decode(publicKeyContent, Base64.DEFAULT);
-
-        X509EncodedKeySpec spec = new X509EncodedKeySpec(decoded);
-        KeyFactory keyF = KeyFactory.getInstance("RSA");
-        PublicKey publicK = keyF.generatePublic(spec);
-        return publicK;
-    }
-
-    public PrivateKey getPrivateKey() throws Exception {
-
-        String tContents = "";
-
-        try {
-            InputStream stream = getAssets().open("keypair/user1");
-
-            int size = stream.available();
-            byte[] buffer = new byte[size];
-            stream.read(buffer);
-            stream.close();
-            tContents = new String(buffer);
-        } catch (IOException e) {
-            // Handle exceptions here
-        }
-
-
-        //String publicKeyContent = new String(getAssets().open("keypair/user1").toString());
-        System.out.println("publicKeyContentpublicKeyContent");
-        System.out.println(tContents);
-
-        String privKeyPEM = tContents.replace("-----BEGIN OPENSSH PRIVATE KEY-----\n", "");
-        privKeyPEM = privKeyPEM.replace("-----END OPENSSH PRIVATE KEY-----", "");
-
-        byte[] keyBytes = privKeyPEM.getBytes();
-        //byte [] decoded = Base64.decode(privKeyPEM, Base64.DEFAULT);
-
-        PKCS8EncodedKeySpec spec =
-                new PKCS8EncodedKeySpec(keyBytes);
+    public PrivateKey getPrivateKey(Integer i) throws Exception {
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePrivate(spec);
+
+        PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(java.util.Base64.getDecoder().decode(privateKeyY));
+        PrivateKey privateKey = kf.generatePrivate(keySpecPKCS8);
+
+        return privateKey;
     }
 
     @Override
@@ -254,21 +221,28 @@ public class MainActivity extends AppCompatActivity {
                                         keyParGenerator.initialize(2048);
                                         KeyPair keyPair = keyParGenerator.generateKeyPair();
                                         PublicKey publicKey = keyPair.getPublic();
-                                        PrivateKey privateKey = keyPair.getPrivate();
+                                        //PrivateKey privateKey = keyPair.getPrivate();
+
+
 
                                         Signature firma = Signature.getInstance("SHA256withRSA");
-                                        firma.initSign(privateKey);
                                         String dataNumbers = numSab + "-" + numCam + "-" + numMes + "-" + numSil;
+
                                         int index = radioGroup.indexOfChild(findViewById(radioGroup.getCheckedRadioButtonId()));
                                         if(index == 0) {
+                                            PrivateKey privateKey = getPrivateKey(index);
+                                            firma.initSign(privateKey);
                                             firma.update(dataNumbers.getBytes());
                                             byte[] firma_ = firma.sign();
                                             String firmmm = Base64.encodeToString(firma_, Base64.NO_WRAP);
-                                            String publickeyy = java.util.Base64.getEncoder().encodeToString(publicKey.getEncoded());
 
+                                            String privateKeyy = java.util.Base64.getEncoder().encodeToString(privateKey.getEncoded());
+                                            String publickeyy = publicKeyY;
+                                            //PrivateKey privateKey =
 
-                                            System.out.println("USER 1");
-                                            System.out.println(firmmm);
+                                            System.out.println("USER 1 public and private");
+                                            System.out.println(publickeyy);
+                                            System.out.println(privateKeyy);
 
                                             String message = dataNumbers + "," + firmmm + "," + publickeyy;
                                             startClient(message);
@@ -277,11 +251,14 @@ public class MainActivity extends AppCompatActivity {
                                             firma.update(dataNumbers.getBytes());
                                             byte[] firma_ = firma.sign();
                                             String firmmm = Base64.encodeToString(firma_,  Base64.NO_WRAP);
-                                            String publickeyy = Base64.encodeToString(publicKey.getEncoded(),  Base64.NO_WRAP | Base64.URL_SAFE);
+                                            String publickeyy = java.util.Base64.getEncoder().encodeToString(publicKey.getEncoded());
+                                            //String privateKeyy = java.util.Base64.getEncoder().encodeToString(privateKey.getEncoded());
 
 
-                                            System.out.println("USER 2");
-                                            System.out.println(firmmm);
+                                            System.out.println("USER 2 public and private");
+                                            System.out.println(publickeyy);
+                                            //System.out.println(privateKeyy);
+
 
                                             String message = dataNumbers + "," + firmmm + "," + publickeyy;
                                             startClient(message);
@@ -291,10 +268,12 @@ public class MainActivity extends AppCompatActivity {
                                             byte[] firma_ = firma.sign();
                                             String firmmm = Base64.encodeToString(firma_, Base64.NO_WRAP);
                                             String publickeyy = java.util.Base64.getEncoder().encodeToString(publicKey.getEncoded());
+                                            //String privateKeyy = java.util.Base64.getEncoder().encodeToString(privateKey.getEncoded());
 
 
-                                            System.out.println("USER 3");
-                                            System.out.println(firmmm);
+                                            System.out.println("USER 3 public and private");
+                                            System.out.println(publickeyy);
+                                            //System.out.println(privateKeyy);
 
                                             String message = dataNumbers + "," + firmmm + "," + publickeyy;
                                             startClient(message);
@@ -302,6 +281,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                                     }catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+                                        e.printStackTrace();
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                     }
 
