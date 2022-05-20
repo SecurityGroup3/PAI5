@@ -3,10 +3,10 @@ import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.Base64;
 
@@ -15,19 +15,47 @@ import javax.net.ssl.TrustManagerFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class AuxiliarMethods {
+
+    protected static String publicKey1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzvziRpETVJ+agiN8iNs/VFpe5sxemrxnogunkfsNczHqUMa7Jw+VELtrD/G1cjT7LwQt2DoJ34UHWg3S7VgVs3xAqE30/im0HzgINRQyg0/proHIlL2rYqi4kANIPPo32BIRu0mbqfF6yWQ2ye0Ol1yfEyCgL90GysRb/BZunlJdGEFDvVY+u14r2WPWjpk1a3CJYpGQ1yDsXzYZZG372+ZwSmBI/qIX4AaDKeoAj+JuMLHTXYDhEQzRsc+qZhzJ7vv9/xSuxiPcL9fjpNFRIUoUQYlSC1XZ9o5mip3+ldzpKX/p8Du0JwFKdOtbmVaZdZR13VNRl2j0PgFBFICxYwIDAQAB";
+    protected static String publicKey2 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoCYI49zqOcQ+3zTCWaFduIMDgVUDECL3Ayer/GAA7DajZGuSan/RtYFz//ZhPMsGW9N/Aeq9FjbfJQSXrdfoyffmD38IqwOtlcDHUh5/nMFAb2aHP1xCYPpLvrWyBxwxewvlqkRInoDvma/lEt9EJkTCcEmGuTcfJmqHYgdU6qv8DhAfiX38Dxe3gN/VQiI+rlsl54oTsxY4Px3iqFMy1S7cAg8alPk4ms9S+btem7EOuX/BcX8r8PFLUl3Ds6+sVvCtw9G2gG8eJdY+4HTnA5q1GODDjUMJ5nTJXqb7LIVF79/vODwmRSdBEurj36cBS+2tbEg1pW7w1mehXxrN/wIDAQAB";
+    protected static String publicKey3 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyZgO0jNogfzqCoEa/zDp0CaJijC+07lu9Mc8iTzY5/B5XNV+RxnRnYjFwUIDq9nugAimY0QCVk/EC6bG+LYbp8qNCH2dpK2WLWBmYGh6IMD0sSSnhTiQsptYszTbiFIc0alQmSBy3AnaQpqTpq3DNenunrFCJ2ZtX9BU0Zjrt09iqWfTnk/4/EsvVWRR9ntn9rpnB6GA50PvkI02+whHl4uldUrUXRqrRFoJ7pRVgjW1OdVyOk/WTfhSMypcv1SkpoO6w2dj+rRe/DNT1SQGVogIcC2kEAyntbUai+3r5/Cl/kY4soUHZZnNbUVkiUblUOxpmG3R0h0xY8wall6p/wIDAQAB";
+
+    public static RSAPublicKey getPublicKey(Integer user) throws Exception {
+        String publicKey = "";
+        System.out.println("USER "+ user);
+        switch (user){
+            case (0): {
+                publicKey = publicKey1;
+                System.out.println("Petición del usuario 1");
+                break;
+            }
+            case (1): { 
+                publicKey = publicKey2;
+                System.out.println("Petición del usuario 2");
+                break;
+            }
+            case (2): {
+                publicKey = publicKey3;
+                System.out.println("Petición del usuario 3");
+                break;
+            }
+        }
+        
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey));
+        RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
+
+        return pubKey;
+    }
 
     public static TrustManagerFactory getTrustFactoryClient() throws Exception {
 
@@ -83,7 +111,7 @@ public class AuxiliarMethods {
         Integer mesas = Integer.valueOf(values[3]);
         String message = dataSplit[0];
         String firm = dataSplit[1];
-        String publicKey = dataSplit[2];
+        Integer user = Integer.valueOf(dataSplit[2]);
         if (sabanas <= 0 || camas <= 0 || sillas <= 0 || mesas <= 0 ||
                 sabanas > 300 || camas > 300 || sillas > 300 || mesas > 300) {
             // Call to error
@@ -92,10 +120,9 @@ public class AuxiliarMethods {
             writeTransactionsFile(dataSplit[0] + "NOTOKEY");
             return false;
         } else {
-            byte[] bytesPublicKey = Base64.getDecoder().decode(dataSplit[2].getBytes());
-            byte[] bytesFirma = Base64.getDecoder().decode(dataSplit[1].getBytes());
-
-            PublicKey publicK = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytesPublicKey));
+            //byte[] bytesPublicKey = Base64.getDecoder().decode(dataSplit[2].getBytes());
+            byte[] bytesFirma = Base64.getDecoder().decode(firm.getBytes());
+            RSAPublicKey publicK = getPublicKey(user);
             Signature sg = Signature.getInstance("SHA256withRSA");
             sg.initVerify(publicK);
             sg.update(message.getBytes());
@@ -103,7 +130,6 @@ public class AuxiliarMethods {
             System.out.println(result);
             writeIntermediateFile("OK");
             writeTransactionsFile(dataSplit[0] + "OK");
-
             return true;
         }
     }
