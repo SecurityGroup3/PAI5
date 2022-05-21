@@ -31,13 +31,13 @@ public class AuxiliarMethods {
 
     public static RSAPublicKey getPublicKey(Integer user) throws Exception {
         String publicKey = "";
-        switch (user){
+        switch (user) {
             case (0): {
                 publicKey = publicKey1;
                 System.out.println("Petición del usuario 1");
                 break;
             }
-            case (1): { 
+            case (1): {
                 publicKey = publicKey2;
                 System.out.println("Petición del usuario 2");
                 break;
@@ -48,7 +48,7 @@ public class AuxiliarMethods {
                 break;
             }
         }
-        
+
         KeyFactory kf = KeyFactory.getInstance("RSA");
         X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey));
         RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
@@ -118,7 +118,7 @@ public class AuxiliarMethods {
             writeTransactionsFile(dataSplit[0] + "NOTOKEY");
             return false;
         } else {
-            //byte[] bytesPublicKey = Base64.getDecoder().decode(dataSplit[2].getBytes());
+            // byte[] bytesPublicKey = Base64.getDecoder().decode(dataSplit[2].getBytes());
             byte[] bytesFirma = Base64.getDecoder().decode(firm.getBytes());
             RSAPublicKey publicK = getPublicKey(user);
             Signature sg = Signature.getInstance("SHA256withRSA");
@@ -136,8 +136,8 @@ public class AuxiliarMethods {
         BufferedReader objReader = null;
         String strCurrentLine = null;
         try {
-            objReader = new BufferedReader(new FileReader("./log.txt"));
-            final List<String> lines = Files.lines(Paths.get("./log.txt")).collect(Collectors.toList());
+            objReader = new BufferedReader(new FileReader("./ServerSide/log.txt"));
+            final List<String> lines = Files.lines(Paths.get("./ServerSide/log.txt")).collect(Collectors.toList());
             if (state == "OK") {
                 Integer total = 0;
                 Integer acert = 0;
@@ -152,36 +152,39 @@ public class AuxiliarMethods {
                 }
                 total = total + 1;
                 acert = acert + 1;
-                lines.add(Math.min(1, lines.size()), String.valueOf(total));
-                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./log.txt"),
+                List<String> lines_ = new ArrayList<>();
+                lines_.add(String.valueOf(total));
+                lines_.add(String.valueOf(acert));
+                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./ServerSide/log.txt"),
                         Charset.forName("UTF-8"))) {
-                    for (final String line : lines) {
-                        out.append(line).append(System.lineSeparator());
+                    for (final String line : lines_) {
+                        out.write(line);
+                        out.newLine();
                     }
                 }
 
-                lines.add(Math.min(2, lines.size()), String.valueOf(acert));
-                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./log.txt"),
-                        Charset.forName("UTF-8"))) {
-                    for (final String line : lines) {
-                        out.append(line).append(System.lineSeparator());
-                    }
-                }
             } else {
                 Integer total = 0;
+                Integer acert = 0;
                 Integer i = 0;
                 while ((strCurrentLine = objReader.readLine()) != null) {
                     if (i == 0) {
-                        total = Integer.valueOf(strCurrentLine);
+                        total = Integer.valueOf(strCurrentLine.trim());
+                    } else if (i == 1) {
+                        acert = Integer.valueOf(strCurrentLine.trim());
                     }
                     i++;
                 }
                 total = total + 1;
-                lines.add(Math.min(1, lines.size()), String.valueOf(total));
-                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./log.txt"),
+                List<String> lines_ = new ArrayList<>();
+                lines_.add(String.valueOf(total));
+                lines_.add(String.valueOf(acert));
+                System.out.println(lines_);
+                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./ServerSide/log.txt"),
                         Charset.forName("UTF-8"))) {
-                    for (final String line : lines) {
-                        out.append(line).append(System.lineSeparator());
+                    for (final String line : lines_) {
+                        out.write(line);
+                        out.newLine();
                     }
                 }
             }
@@ -197,10 +200,11 @@ public class AuxiliarMethods {
         BufferedReader objReader = null;
 
         try {
-            objReader = new BufferedReader(new FileReader("./transactions.txt"));
-            final List<String> lines = Files.lines(Paths.get("./transactions.txt")).collect(Collectors.toList());
+            objReader = new BufferedReader(new FileReader("./ServerSide/transactions.txt"));
+            final List<String> lines = Files.lines(Paths.get("./ServerSide/transactions.txt"))
+                    .collect(Collectors.toList());
             lines.add(Math.min(lines.size(), lines.size()), transaction);
-            try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./transactions.txt"),
+            try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./ServerSide/transactions.txt"),
                     Charset.forName("UTF-8"))) {
                 for (final String line : lines) {
                     out.append(line).append(System.lineSeparator());
@@ -219,12 +223,12 @@ public class AuxiliarMethods {
         String strCurrentLine;
 
         try {
-            objReader = new BufferedReader(new FileReader("./tendences.txt"));
+            objReader = new BufferedReader(new FileReader("./ServerSide/tendences.txt"));
             Integer i = 0;
             while ((strCurrentLine = objReader.readLine()) != null) {
                 i++;
             }
-            objReader = new BufferedReader(new FileReader("./log.txt"));
+            objReader = new BufferedReader(new FileReader("./ServerSide/log.txt"));
             float total = 0;
             float acert = 0;
             Integer j = 0;
@@ -236,34 +240,36 @@ public class AuxiliarMethods {
                 }
                 j++;
             }
-            objReader = new BufferedReader(new FileReader("./tendences.txt"));
+            objReader = new BufferedReader(new FileReader("./ServerSide/tendences.txt"));
             float ratio_ = acert / total;
             if (i < 2) {
-                final List<String> lines = Files.lines(Paths.get("./tendences.txt")).collect(Collectors.toList());
+                final List<String> lines = Files.lines(Paths.get("./ServerSide/tendences.txt"))
+                        .collect(Collectors.toList());
                 Month mes = LocalDateTime.now().getMonth();
                 int anyo = LocalDateTime.now().getYear();
                 String result = mes.name() + "," + String.valueOf(anyo) + "," + String.valueOf(ratio_) + "," + "0";
                 lines.add(Math.min(lines.size(), lines.size()), result);
-                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./tendences.txt"),
+                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./ServerSide/tendences.txt"),
                         Charset.forName("UTF-8"))) {
                     for (final String line : lines) {
                         out.append(line).append(System.lineSeparator());
                     }
                 }
-                final List<String> lines_ = Files.lines(Paths.get("./log.txt")).collect(Collectors.toList());
+                final List<String> lines_ = Files.lines(Paths.get("./ServerSide/log.txt")).collect(Collectors.toList());
 
                 lines_.add(Math.min(1, lines.size()), "0");
-                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./log.txt"),
+                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./ServerSide/log.txt"),
                         Charset.forName("UTF-8"))) {
                     for (final String line : lines_) {
                         out.append(line).append(System.lineSeparator());
                     }
                 }
 
-                final List<String> lines__ = Files.lines(Paths.get("./log.txt")).collect(Collectors.toList());
+                final List<String> lines__ = Files.lines(Paths.get("./ServerSide/log.txt"))
+                        .collect(Collectors.toList());
 
                 lines__.add(Math.min(2, lines.size()), "0");
-                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./log.txt"),
+                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./ServerSide/log.txt"),
                         Charset.forName("UTF-8"))) {
                     for (final String line : lines__) {
                         out.append(line).append(System.lineSeparator());
@@ -271,10 +277,11 @@ public class AuxiliarMethods {
                 }
 
             } else {
-                final List<String> lines = Files.lines(Paths.get("./tendences.txt")).collect(Collectors.toList());
+                final List<String> lines = Files.lines(Paths.get("./ServerSide/tendences.txt"))
+                        .collect(Collectors.toList());
                 Month mes = LocalDateTime.now().getMonth();
                 int anyo = LocalDateTime.now().getYear();
-                objReader = new BufferedReader(new FileReader("./tendences.txt"));
+                objReader = new BufferedReader(new FileReader("./ServerSide/tendences.txt"));
                 List<String> linesList = new ArrayList<>();
                 while ((strCurrentLine = objReader.readLine()) != null) {
                     linesList.add(strCurrentLine.split(",")[2]);
@@ -294,14 +301,14 @@ public class AuxiliarMethods {
 
                 String result = mes.name() + "," + String.valueOf(anyo) + "," + String.valueOf(ratio_) + "," + tende;
                 lines.add(Math.min(lines.size(), lines.size()), result);
-                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./tendences.txt"),
+                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./ServerSide/tendences.txt"),
                         Charset.forName("UTF-8"))) {
                     for (final String line : lines) {
                         out.append(line).append(System.lineSeparator());
                     }
                 }
 
-                final List<String> lines_ = Files.lines(Paths.get("./log.txt")).collect(Collectors.toList());
+                final List<String> lines_ = Files.lines(Paths.get("./ServerSide/log.txt")).collect(Collectors.toList());
 
                 lines_.add(Math.min(1, lines.size()), "0");
                 try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./log.txt"),
@@ -311,10 +318,11 @@ public class AuxiliarMethods {
                     }
                 }
 
-                final List<String> lines__ = Files.lines(Paths.get("./log.txt")).collect(Collectors.toList());
+                final List<String> lines__ = Files.lines(Paths.get("./ServerSide/log.txt"))
+                        .collect(Collectors.toList());
 
                 lines__.add(Math.min(2, lines.size()), "0");
-                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./log.txt"),
+                try (final BufferedWriter out = Files.newBufferedWriter(Paths.get("./ServerSide/log.txt"),
                         Charset.forName("UTF-8"))) {
                     for (final String line : lines__) {
                         out.append(line).append(System.lineSeparator());
